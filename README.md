@@ -30,7 +30,7 @@ A simple REST API that serves random Ayahs and Hadiths, built with FastAPI. It i
 
 4. Run tests:
    ```bash
-   pytest
+   python -m pytest
    ```
 5. Run generic security scan (SAST):
    ```bash

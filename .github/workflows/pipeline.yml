@@ -28,7 +28,7 @@ jobs:
         # Run bandit to check for security issues
         # -r: recursive, -ll: log level (medium/high only)
         # Assuming we exit with 0 even if issues found for this demo, or enforce failure
-        bandit -r daily-hidayah-api/app -ll
+        bandit -r app -ll
       working-directory: ./ # Adjust if needed, but structure is usually root of repo. Wait, user created `daily-hidayah-api` folder inside `Devops Project`. 
                             # If this is the root of the git repo, we need to adjust paths.
                             # Assuming the repo root IS `daily-hidayah-api` content.
@@ -38,7 +38,7 @@ jobs:
                             
     - name: Run Unit Tests
       run: |
-        pytest
+        python -m pytest
       
   docker-build:
     needs: build-and-test
