@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: daily-hidayah-api
+  labels:
+    app: daily-hidayah-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: daily-hidayah-api
+  template:
+    metadata:
+      labels:
+        app: daily-hidayah-api
+    spec:
+      containers:
+      - name: daily-hidayah-api
+        image: daily-hidayah-api:latest # For local Minikube, ensure imagePullPolicy is specific if needed, or use full tag
+        imagePullPolicy: IfNotPresent # Useful for local minikube usage without pushing to hub
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /guidance
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /guidance
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
