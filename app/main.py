@@ -43,7 +43,7 @@ async def log_requests(request, call_next):
     logger.info(f"Method={method} Endpoint={endpoint} Status={status_code} Latency={process_time:.4f}s")
     
     # Update metrics
-    if endpoint != "/metrics": # Avoid tracking metrics scraping itself excessively if desired, or keep it.
+    if endpoint != "/metrics": 
         REQUEST_COUNT.labels(method=method, endpoint=endpoint, status=status_code).inc()
         
     return response

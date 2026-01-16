@@ -29,12 +29,7 @@ jobs:
         # -r: recursive, -ll: log level (medium/high only)
         # Assuming we exit with 0 even if issues found for this demo, or enforce failure
         bandit -r app -ll
-      working-directory: ./ # Adjust if needed, but structure is usually root of repo. Wait, user created `daily-hidayah-api` folder inside `Devops Project`. 
-                            # If this is the root of the git repo, we need to adjust paths.
-                            # Assuming the repo root IS `daily-hidayah-api` content.
-                            # But wait, I created the folder `daily-hidayah-api`.
-                            # If the user pushes `daily-hidayah-api` as the root of the repo, then `app/` is at root.
-                            # I will assume the repo root = `daily-hidayah-api` folder content.
+      working-directory: ./
                             
     - name: Run Unit Tests
       run: |
