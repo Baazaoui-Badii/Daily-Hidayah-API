@@ -1,0 +1,19 @@
+[bandit]
+# Bandit configuration for SAST security scanning
+
+# Exclude paths
+exclude_dirs = ['/tests', '/.venv', '/.pytest_cache']
+
+# Severity level (LOW, MEDIUM, HIGH)
+# Only report medium and high severity issues
+severity = MEDIUM
+
+# Confidence level (LOW, MEDIUM, HIGH)
+confidence = MEDIUM
+
+# Tests to skip (comma-separated list of test IDs)
+# Example: skips = B404,B603
+skips = 
+
+# Tests to run (leave empty to run all)
+tests =
