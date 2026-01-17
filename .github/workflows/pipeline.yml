@@ -23,20 +23,70 @@ jobs:
         pip install bandit pytest httpx
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
-    - name: Lint with Bandit (SAST)
+    - name: Run SAST with Bandit
       run: |
-        # Run bandit to check for security issues
-        # -r: recursive, -ll: log level (medium/high only)
-        # Assuming we exit with 0 even if issues found for this demo, or enforce failure
+        # Generate JSON report for artifact
+        bandit -r app -f json -o bandit-report.json || true
+        # Run again with failure on medium/high issues
         bandit -r app -ll
       working-directory: ./
+      
+    - name: Upload SAST Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: bandit-security-report
+        path: bandit-report.json
                             
     - name: Run Unit Tests
       run: |
         python -m pytest
+
+  dast:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build Docker image
+      run: docker build -t daily-hidayah-api:test .
+      
+    - name: Start application container
+      run: |
+        docker run -d -p 8000:8000 --name test-app daily-hidayah-api:test
+        sleep 10
+        
+    - name: Verify app is running
+      run: |
+        curl --retry 5 --retry-delay 2 --retry-connrefused http://localhost:8000/
+        curl http://localhost:8000/guidance
+      
+    - name: Run OWASP ZAP Baseline Scan
+      run: |
+        docker run --network="host" -v $(pwd):/zap/wrk/:rw \
+          zaproxy/zap-stable zap-baseline.py \
+          -t http://localhost:8000 \
+          -r zap-report.html \
+          -J zap-report.json \
+          -I || true
+      
+    - name: Upload DAST Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: zap-security-report
+        path: |
+          zap-report.html
+          zap-report.json
+          
+    - name: Cleanup
+      if: always()
+      run: |
+        docker stop test-app || true
+        docker rm test-app || true
       
   docker-build:
-    needs: build-and-test
+    needs: [build-and-test, dast]
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' # Only push on merge/push to main
     steps:
